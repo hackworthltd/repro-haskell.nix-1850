@@ -42,3 +42,8 @@ One thing I noticed is that the package db
 indeed does not contain
 ansi-terminal >=0.9.1 && <0.10,
 but instead has ansi-terminal-0.11.3-1b8HCC1rW2d7L0NjY6LD4a.conf
+
+The problem appears to be in the workaround for https://github.com/input-output-hk/haskell.nix/issues/839:
+if the following line in flake.nix is commented out
+  packages.repro.components.tests.repro-test.build-tools = [ final.haskell-nix.snapshots."lts-19.9".tasty-discover ];
+then nix builds work fine, but cabal builds in a nix-develop shell cannot find tasty-discover

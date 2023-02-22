@@ -46,7 +46,7 @@ test-suite repro-test
   hs-source-dirs: test
   --TODO This currently breaks with haskell.nix, so we manually add it to `flake.nix` instead.
   -- See: https://github.com/input-output-hk/haskell.nix/issues/839
-  -- build-tool-depends: tasty-discover:tasty-discover ^>=4.2.4
+  build-tool-depends: tasty-discover:tasty-discover ^>=4.2.4
   build-depends:
     , base
     , tasty     ^>=1.4.2.1

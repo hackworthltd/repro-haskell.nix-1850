@@ -326,7 +326,7 @@
                   }
                   {
                     #TODO This shouldn't be necessary - see the commented-out `build-tool-depends` in repro.cabal.
-                    packages.repro.components.tests.repro-test.build-tools = [ final.haskell-nix.snapshots."lts-19.9".tasty-discover ];
+                    #packages.repro.components.tests.repro-test.build-tools = [ final.haskell-nix.snapshots."lts-19.9".tasty-discover ];
                   }
                   (
                     let
