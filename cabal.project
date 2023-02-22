@@ -1,0 +1,10 @@
+index-state: 2023-02-02T00:00:00Z
+
+packages:
+  repro
+
+optimization: 0
+
+package *
+  ghc-options: -fwrite-ide-info
+  benchmarks: True

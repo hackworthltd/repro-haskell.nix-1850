@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "repro/src"
+      component: "lib:repro"
+
+    - path: "repro/test"
+      component: "repro:test:repro-test"
+
+    - path: "repro/bench/Main.hs"
+      component: "repro:bench:repro-benchmark"
