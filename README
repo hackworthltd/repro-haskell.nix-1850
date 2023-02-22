@@ -47,3 +47,4 @@ The problem appears to be in the workaround for https://github.com/input-output-
 if the following line in flake.nix is commented out
   packages.repro.components.tests.repro-test.build-tools = [ final.haskell-nix.snapshots."lts-19.9".tasty-discover ];
 then nix builds work fine, but cabal builds in a nix-develop shell cannot find tasty-discover
+A newer snapshot does not fix the problem.
