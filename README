@@ -1,0 +1,44 @@
+This is a reproducer for
+https://github.com/input-output-hk/haskell.nix/issues/1850
+
+To reproduce, run
+nix build .#repro:test:repro-test
+and notice that the build for ansi-wl-pprint-lib-ansi-wl-pprint fails (on x86_64-linux) (this races with a similar failure for the unix package):
+error: builder for '/nix/store/4shqlbwmqw9by6v5s7jrhhc5wkz8n3iy-ansi-wl-pprint-lib-ansi-wl-pprint-0.6.9.drv' failed with exit code 1;
+       last 10 log lines:
+       > source root is ansi-wl-pprint-0.6.9
+       > setting SOURCE_DATE_EPOCH to timestamp 1000000000 of file ansi-wl-pprint-0.6.9/Text/PrettyPrint/ANSI/Leijen/Internal.hs
+       > patching sources
+       > configuring
+       > Configure flags:
+       > --prefix=/nix/store/dz9s4d1i971dymn6aknhsmlvhmf43281-ansi-wl-pprint-lib-ansi-wl-pprint-0.6.9 lib:ansi-wl-pprint --package-db=clear --package-db=/nix/store/xw4c44svfb8jihx058ddxzv15xgjszgx-ansi-wl-pprint-lib-ansi-wl-pprint-0.6.9-config/lib/ghc-9.0.2/package.conf.d --flags=-example --with-ghc=ghc --with-ghc-pkg=ghc-pkg --with-hsc2hs=hsc2hs --with-gcc=cc --with-ld=ld.gold --ghc-option=-optl-fuse-ld=gold --ld-option=-fuse-ld=gold --with-ar=ar --with-strip=strip --disable-executable-stripping --disable-library-stripping --disable-library-profiling --disable-profiling --enable-static --enable-shared --disable-coverage --enable-library-for-ghci --datadir=/nix/store/046b546z530qybpswgiks490g0naaswn-ansi-wl-pprint-lib-ansi-wl-pprint-0.6.9-data/share/ghc-9.0.2 --enable-split-sections
+       > Configuring library for ansi-wl-pprint-0.6.9..
+       > Error: Setup: Encountered missing or private dependencies:
+       > ansi-terminal >=0.9.1 && <0.10
+       >
+       For full logs, run 'nix log /nix/store/4shqlbwmqw9by6v5s7jrhhc5wkz8n3iy-ansi-wl-pprint-lib-ansi-wl-pprint-0.6.9.drv'.
+error: 1 dependencies of derivation '/nix/store/7rdg2q20mxcaq49il8fakval0clyb5f1-optparse-applicative-lib-optparse-applicative-0.16.1.0-config.drv' failed to build
+error: 1 dependencies of derivation '/nix/store/0sjivz69pm73kh58l6d6rxf89k9xa366-optparse-applicative-lib-optparse-applicative-0.16.1.0.drv' failed to build
+error: 1 dependencies of derivation '/nix/store/bhnpk0mmfbycbryjpw7l9a13520p1qg7-tasty-lib-tasty-1.4.2.3-config.drv' failed to build
+error: 1 dependencies of derivation '/nix/store/9alxw2rpj7n5dxix957bfipwx4ak4n1p-tasty-lib-tasty-1.4.2.3.drv' failed to build
+error: 1 dependencies of derivation '/nix/store/n89prhmcf1ahvpjs0nghbn93lxi00fzm-tasty-discover-lib-tasty-discover-4.2.4-config.drv' failed to build
+error: 1 dependencies of derivation '/nix/store/lsx6pfbsrwad39xys631ns5vd0f6d3af-tasty-discover-lib-tasty-discover-4.2.4.drv' failed to build
+error: 1 dependencies of derivation '/nix/store/jbsg6d196734k5j58zh3s6zs27czk0k0-tasty-discover-exe-tasty-discover-4.2.4.drv' failed to build
+error: 1 dependencies of derivation '/nix/store/542lj56yky34d9df35i4icyljnwiv9fm-repro-test-repro-test-0.0.0.1.drv' failed to build
+
+
+Note that a
+nix build .#repro:lib:repro
+succeeds, even though that depends on optparse-applicative, which depends on ansi-wl-pprint
+
+Haskell.nix must building a slightly different ansi-wl-pprint-0.6.9 when pulled in via
+tasty-discover->tasty->optparse-applicative->ansi-wl-pprint
+rather than
+optparse-applicative->ansi-wl-pprint
+
+
+One thing I noticed is that the package db
+--package-db=/nix/store/xw4c44svfb8jihx058ddxzv15xgjszgx-ansi-wl-pprint-lib-ansi-wl-pprint-0.6.9-config/lib/ghc-9.0.2/package.conf.d
+indeed does not contain
+ansi-terminal >=0.9.1 && <0.10,
+but instead has ansi-terminal-0.11.3-1b8HCC1rW2d7L0NjY6LD4a.conf
